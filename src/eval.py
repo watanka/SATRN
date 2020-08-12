@@ -8,7 +8,7 @@ python eval.py --config_file=<config_file_path>
 import os
 import fire
 import time
-
+from io import open
 import tensorflow as tf
 from psutil import virtual_memory
 
@@ -63,7 +63,7 @@ def main(config_file=None):
 
         eval_loader = DatasetLodaer(dataset_paths=FLAGS.eval.dataset_paths,
                                     dataset_portions=None,
-                                    batch_size=FLAGS.eval.batch_size
+                                    batch_size=FLAGS.eval.batch_size,
                                     label_maxlen=FLAGS.label_maxlen,
                                     out_charset=out_charset,
                                     preprocess_image=net.preprocess_image,
@@ -117,7 +117,7 @@ def main(config_file=None):
         _step = sess.run(global_step)
         infet_t = 0
 
-        # Run test
+        # Run test # eval_preds를 전부 print 해버린다.
         start_t = time.time()
         eval_cnts, eval_errs, eval_err_rates, eval_preds = \
             validate(sess,
@@ -135,7 +135,7 @@ def main(config_file=None):
     total_total = 0
 
     for dataset, result in eval_preds.items():
-        res_file = open(os.path.join(res_dir, '{}.txt'.format(dataset)), 'w')
+        res_file = open(os.path.join(res_dir, '{}.txt'.format(dataset)), 'w', encoding='utf-8')
         total = eval_cnts[dataset]
         correct = total - eval_errs[dataset]
         acc = 1. - eval_err_rates[dataset]
@@ -143,14 +143,17 @@ def main(config_file=None):
 
         for f, s, g in result:
             f = f.decode('utf8')
-
-            if FLAGS.eval.verbose:
-                print('FILE : ' + f)
-                print('PRED : ' + s)
-                print('ANSW : ' + g)
-                print('=' * 50)
-
-            res_file.write('{}\t{}\n'.format(f, s))
+            s = s.strip().encode('utf-8').decode('utf-8')
+            
+#             if FLAGS.eval.verbose:
+#                 print('FILE : ' + f)
+#                 print('PRED : ' + s)
+#                 print('ANSW : ' + g)
+#                 print('=' * 50)
+            try :
+                res_file.write('{}\t{}\n'.format(f, s ))
+            except :
+                pass
 
         res_s = 'DATASET : %s\tCORRECT : %d\tTOTAL : %d\tACC : %f' % \
                 (dataset, correct, total, acc)

@@ -35,9 +35,9 @@ def gen_data(gt_exp,
     """
     """
     # Parse gt.txt
-    print(gt_exp)
+   
     img_filenames, texts = parse_gt(gt_exp, lowercase, alphanumeric)
-    print(img_filenames)
+    
     # Prepare stuff
     num_shards = (len(img_filenames) - 1) // images_per_shard + 1
     num_digits = math.ceil(math.log10(num_shards - 1)) \
@@ -122,14 +122,17 @@ def gen_shard(image_filenames,
               verbose=True):
     """
     """
-    writer = tf.python_io.TFRecordWriter(output_filename)
+    writer = tf.io.TFRecordWriter(output_filename)
     num_of_examples_per_shard = 0
-
+    image_filenames = [image.replace('.txt', '.jpg') for image in image_filenames]
     for filename, text in zip(image_filenames, texts):
-        if os.stat(filename).st_size == 0:
-            print('SKIPPING', filename)
-            continue
-
+        try :
+            if os.stat(filename).st_size == 0:
+                print('SKIPPING', filename)
+                continue
+        except :
+            print(filename)
+            
         try:
             image_data, height, width = get_image(filename)
 
@@ -168,6 +171,7 @@ def parse_gt(gt_exp, lowercase, alphanumeric, with_spe=False):
             if line.find('\t') > 0:
                 filename, text = line.split('\t')
                 filename = filename.strip()
+                filename = filename.replace('txt', 'jpg')
                 text = text.strip()
 
             else:
@@ -185,7 +189,7 @@ def parse_gt(gt_exp, lowercase, alphanumeric, with_spe=False):
             if lowercase:
                 text = text.lower()
 
-            filenames.append(os.path.join(gt_dir, filename))
+            filenames.append( filename )#os.path.join(gt_dir, os.path.basename(filename)))
             texts.append(text)
         f.close()
 

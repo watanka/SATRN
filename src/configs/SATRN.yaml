@@ -1,12 +1,12 @@
 network: "SATRN"
-charset: "./resources/charset.txt"
+charset: "./resources/krn_charset.txt"
 resize_hw:
   height: 32
   width: 100
 use_rgb: False
 label_maxlen: 25
 seed: 42
-model_dir: "../saved_models/satrn"
+model_dir: "../saved_models/satrn/trained0812"
 
 hidden_size: 512
 filter_size: 2048
@@ -18,16 +18,16 @@ rot_stddev: 0.6
 
 train:
   dataset_paths:
-      - "../data/train/MJS90/mjsynth_*_case-words-*.tfrecord"     # 9M   mjsynth train+valid+test
-      - "../data/train/MJS90/synth90_alpha_case-words-*.tfrecord" # 5.5M synthtext without special symbol
-      - "../data/train/MJS90/synth90_spe_case-words-*.tfrecord"   # 1.5M synthtext with special symbol
+      - '../data/train/*.tfrecord' #"../data/train/MJS90/mjsynth_*_case-words-*.tfrecord"     # 9M   mjsynth train+valid+test
+#       - "../data/train/MJS90/synth90_alpha_case-words-*.tfrecord" # 5.5M synthtext without special symbol
+#       - "../data/train/MJS90/synth90_spe_case-words-*.tfrecord"   # 1.5M synthtext with special symbol
   dataset_portions:
-    - 0.5
-    - 0.375
-    - 0.125
+    - 0.8 
+    - 0.1
+    - 0.1
   lowercase: False
   alphanumeric: False
-  batch_size: 256
+  batch_size: 128
   num_threads: 8
   tune_from: ""
   max_num_steps: 250001
@@ -44,30 +44,18 @@ train:
 
 valid:
   dataset_paths:
-      - "../data/test/cute80/gt.txt"
-      - "../data/test/icdar03/gt.txt"
-      - "../data/test/icdar13/gt.txt"
-      - "../data/test/icdar15/gt.txt"
-      - "../data/test/iiit5k/gt.txt"
-      - "../data/test/svt/gt.txt"
-      - "../data/test/svtp/gt.txt"
-  lowercase: True
-  alphanumeric: True
-  batch_size: 256
+      - '../data/valid/*.tfrecord'
+  lowercase: False
+  alphanumeric: False
+  batch_size: 128
   steps: 1000
 
 eval:
   dataset_paths: 
-      - "../data/test/cute80/gt.txt"
-      - "../data/test/icdar03/gt.txt"
-      - "../data/test/icdar13/gt.txt"
-      - "../data/test/icdar15/gt.txt"
-      - "../data/test/iiit5k/gt.txt"
-      - "../data/test/svt/gt.txt"
-      - "../data/test/svtp/gt.txt"
-  lowercase: True
-  alphanumeric: True
-  model_path: "../saved_models/satrn/model"
-  batch_size: 256
-  verbose: False
+      - '../data/evaluate/*.tfrecord'
+  lowercase: False
+  alphanumeric: False
+  model_path: "../saved_models/satrn"
+  batch_size: 128
+  verbose: True
 

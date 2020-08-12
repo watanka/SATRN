@@ -55,6 +55,8 @@ class DatasetLodaer(object):
 
         if type(self.dataset_paths) is str:
             self.dataset_paths = [self.dataset_paths]
+        if len(self.dataset_paths) == 0 :
+            print(self.dataset_paths)
 
         if type(self.dataset_portions) is float:
             self.dataset_portions = [self.dataset_portions]
@@ -62,16 +64,17 @@ class DatasetLodaer(object):
         if self.dataset_portions is not None:
             assert -1e-9 < abs(1. - sum(self.dataset_portions)) < 1e-9, \
                     str(sum(self.dataset_portions))
-            assert len(self.dataset_paths) == len(self.dataset_portions)
+#             assert len(self.dataset_paths) == len(self.dataset_portions)
         else:
             assert not concat_batch, \
                     'Data portions must be specified for concat_batch'
             self.dataset_portions = [1 for _ in range(len(self.dataset_paths))]
 
-        _, ext = os.path.splitext(
-            os.path.basename(
-                glob.glob(self.dataset_paths[0], recursive=True)[0]))
-
+#         _, ext = os.path.splitext(
+#             os.path.basename(
+#                 glob.glob(self.dataset_paths[0], recursive=True)[0]))
+        ext = '.tfrecord'
+        
         self.ext = ext
         self.tmppaths = []
 

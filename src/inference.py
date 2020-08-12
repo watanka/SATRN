@@ -6,7 +6,7 @@ Usage:
 python inference.py --config_file=<config_file_path> --image_file=<image_file_path>
 """
 
-import cv2
+import cv2, os, glob
 import fire
 import numpy as np
 import tensorflow as tf
@@ -56,15 +56,30 @@ def inference(config_file, image_file):
     restore_model(sess, FLAGS.eval.model_path)
 
     # Run
-    img = cv2.imread(image_file, mode)
-    img = np.reshape(img, [img.shape[0], img.shape[1], num_channel])
-    predicted = sess.run(prediction, feed_dict={image: img})
-    string = get_string(predicted[0], out_charset)
-    string = adjust_string(string, FLAGS.eval.lowercase,
-                           FLAGS.eval.alphanumeric)
-    print(string)
+    if os.path.isfile(image_file) :
+        img = cv2.imread(image_file, mode)
+        img = np.reshape(img, [img.shape[0], img.shape[1], num_channel])
+        predicted = sess.run(prediction, feed_dict={image: img})
+        strings = get_string(predicted[0], out_charset)
+        strings = adjust_string(strings, FLAGS.eval.lowercase,
+                               FLAGS.eval.alphanumeric)
+        print(string)
+    elif os.path.isdir(image_file) :
+        imgs = glob.glob(os.path.join(image_file, '*.jpg'))
+        strings = []
+        for img in imgs :
+            img = cv2.imread(img, mode)
+            img = np.reshape(img, [img.shape[0], img.shape[1], num_channel])
+            predicted = sess.run(prediction, feed_dict={image: img})
+            string = get_string(predicted[0], out_charset)
+            string = adjust_string(string, FLAGS.eval.lowercase,
+                                   FLAGS.eval.alphanumeric)
+            
+            strings.append(string)
+            
+        print(strings)
 
-    return string
+    return strings
 
 
 if __name__ == '__main__':

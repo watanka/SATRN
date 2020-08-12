@@ -247,7 +247,7 @@ def get_init_trained():
         tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES))
 
     def _init_fn(sess, model_path):
-        saver_reader.restore(sess, model_path)
+        saver_reader.restore(sess, tf.train.latest_checkpoint(model_path))
         print('[+] Restored from {}'.format(model_path))
 
     return _init_fn
